@@ -6,6 +6,7 @@ import sys
 import traceback
 import logging
 import json
+import asyncio
 from typing import List
 from pathlib import Path
 
@@ -69,20 +70,19 @@ class Bot(discord.Bot):
         except Exception as e:
             self.logger.error(f'載入 Cogs 時發生錯誤: {str(e)}')
             traceback.print_exc()
-
-    async def setup_hook(self) -> None:
+        
+    async def on_ready(self):
         """機器人啟動時的初始化設置"""
         self.load_all_cogs()
         
         for ext in self.initial_extensions:
             try:
-                await self.load_extension(ext)
+                self.load_extension(ext)
                 self.logger.info(f"成功載入擴展：{ext}")
             except Exception as e:
                 self.logger.error(f"載入擴展 {ext} 時出錯：{str(e)}")
                 traceback.print_exc()
 
-    async def on_ready(self):
         """機器人就緒時的處理"""
         try:
             # 同步斜線命令
@@ -131,4 +131,4 @@ def main():
         traceback.print_exc()
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())
